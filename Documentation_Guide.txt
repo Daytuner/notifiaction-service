@@ -1,0 +1,181 @@
+# Notification Service
+
+A scalable microservice for sending notifications to users through various channels (Email, SMS, In-app).
+
+## Architecture Overview
+
+![Architecture Diagram](https://i.imgur.com/placeholder.png)
+
+The notification service follows these core principles:
+- REST API for sending and retrieving notifications
+- Queue-based processing for reliability and scalability
+- Multiple notification channels (Email, SMS, In-app)
+- Retry mechanism for failed notifications
+
+## Tech Stack
+
+- **Backend**: Node.js with Express
+- **Queue**: RabbitMQ
+- **Database**: MongoDB
+- **Email Service**: Nodemailer (can be replaced with SendGrid, Mailgun, etc.)
+- **SMS Service**: Twilio (can be integrated with other providers)
+
+## Project Structure
+
+```
+notification-service/
+├── src/
+│   ├── api/
+│   │   ├── controllers/
+│   │   │   ├── notificationController.js
+│   │   │   └── userController.js
+│   │   ├── routes/
+│   │   │   ├── notificationRoutes.js
+│   │   │   └── userRoutes.js
+│   │   ├── validators/
+│   │       └── notificationValidator.js
+│   │   
+│   │       
+│   ├── config/
+│   │   ├── index.js
+│   │   └── database.js
+│   ├── models/
+│   │   ├── notification.js
+│   │   └── user.js
+│   ├── services/
+│   │   ├── notificationService.js
+│   │   ├── emailService.js
+│   │   ├── smsService.js
+│   │   └── inAppService.js
+│   ├── queue/
+│   │   ├── producer.js
+│   │   └── consumer.js
+│   ├── utils/
+│   │   ├── logger.js
+│   │   └── errorHandler.js
+│   └── app.js
+├── tests/
+│   ├── unit/
+│   └── integration/
+├── .env.example
+├── .gitignore
+├── package.json
+└── README.md
+```
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB
+- RabbitMQ
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/Daytuner/notifiaction-service.git
+cd notification-service
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Configure environment variables
+```bash
+cp .env.example .env
+# Edit .env file with your configuration
+```
+
+
+
+For development:
+```bash
+npm run dev
+```
+
+## API Documentation
+
+## IPORTANT ADD DEMO USER ##
+```POST  users/demo ```
+
+***REQUEST BODY***
+{
+    "userId":"user123"
+    "email":"example@email.com" //should be the email which u want to check
+    "phoneNumber":"+910000000000" //after +91 put ur number 
+}
+
+### Send a Notification
+```
+POST /notifications
+```
+
+**Request Body:**
+```json
+{
+  "userId": "user123",
+  "type": "EMAIL", // or "SMS", "IN_APP"
+  "title": "Welcome to our platform",
+  "content": "We're glad to have you on board!",
+  "priority": "HIGH", // or "MEDIUM", "LOW"
+  "data": {
+    // Additional metadata specific to notification type
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Notification queued successfully",
+  "data": {
+    "notificationId": "60a3e5b9b0d1c123456789ab"
+  }
+}
+```
+
+### Get User Notifications
+```
+GET /users/{id}/notifications
+```
+
+**Query Parameters:**
+- `status` (optional): "READ", "UNREAD", "ALL"
+- `type` (optional): "EMAIL", "SMS", "IN_APP"
+- `page` (optional): Page number for pagination
+- `limit` (optional): Number of items per page
+
+**Response:**
+```json
+{
+    "success": true,//this implies its successfully sent
+    "data": {
+        "totalCount": 0,
+        "page": 1,
+        "limit": 10,
+        "notifications": []
+    }
+}
+```
+
+## Assumptions
+
+1. Authentication and authorization are handled by an external service. The notification service expects a valid JWT token in the Authorization header.
+2. Users should run demo route first 
+3. For production deployment, additional security measures would be implemented.
+4. Email and SMS provider credentials would be securely stored as environment variables.
+5. For high-scale production environments, additional components like Redis for caching might be needed.
+
+## Future Enhancements
+
+1. Add support for push notifications
+2. Implement notification templates
+3. Add support for notification preferences per user
+4. Implement rate limiting to prevent notification spam
+5. Add analytics for notification engagement
+
